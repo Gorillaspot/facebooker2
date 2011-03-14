@@ -44,9 +44,8 @@ module Facebooker2
       end
       
       def fetch_client_and_user_from_cookie
-        app_id = facebook_app_id
-        if (hash_data = fb_cookie_hash_for_app_id(app_id)) and
-          fb_cookie_signature_correct?(fb_cookie_hash_for_app_id(app_id),facebook_secret)
+        if (hash_data = fb_cookie_hash) and
+          fb_cookie_signature_correct?(fb_cookie_hash,facebook_secret)
           fb_create_user_and_client(hash_data["access_token"],hash_data["expires"],hash_data["uid"])
           return fb_cookie_hash["sig"]
         end
