@@ -16,6 +16,7 @@ module Facebooker2
           cookie = opts[:cookie]
           status = opts[:status]
           xfbml = opts[:xfbml]
+          channel_url = opts[:channel_url]
           extra_js = capture(&proc) if block_given?
           js = <<-JAVASCRIPT
           <script>
@@ -24,6 +25,7 @@ module Facebooker2
                 appId  : '#{app_id}',
                 status : #{status}, // check login status
                 cookie : #{cookie}, // enable cookies to allow the server to access the session
+                #{"channelUrl : '#{channel_url}', // add channelURL to avoid IE redirect problems" unless channel_url.blank?}
                 xfbml  : #{xfbml}  // parse XFBML
               });
               #{extra_js}
@@ -39,8 +41,16 @@ module Facebooker2
               s.appendChild(e);
             }());
           </script>
-        JAVASCRIPT
-        block_given? ? concat(js) : js
+          JAVASCRIPT
+          escaped_js = fb_html_safe(js)
+          if block_given? 
+           concat(escaped_js)
+           #return the empty string, since concat returns the buffer and we don't want double output
+           # from klochner
+           "" 
+          else
+           escaped_js
+          end
         end
       end
     end
